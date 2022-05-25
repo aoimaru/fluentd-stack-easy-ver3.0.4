@@ -1,0 +1,92 @@
+version: "3"
+
+
+services:
+  fluentd-stack-easy-ver3.0.4-app_0:
+    container_name: "fluentd-stack-easy-ver3.0.4-app_0"
+    build: ./app_0
+    volumes:
+      - ./app_0/api:/usr/src/server
+    logging:
+      # ログ出力先にfluentdを指定
+      driver: "fluentd"
+      options:
+        # fluentdサーバの宛先
+        fluentd-address: "localhost:24223"
+        # ログに付与するタグ
+        tag: "app.{{.Name}}.0"
+    ports:
+      - "8010:8000"
+    networks:
+      - fluentd-stack-easy-ver3.0.4-networks
+    depends_on:
+      - fluentd-stack-easy-ver3.0.4-fluentd_0
+
+  fluentd-stack-easy-ver3.0.4-app_1:
+    container_name: "fluentd-stack-easy-ver3.0.4-app_1"
+    build: ./app_1
+    volumes:
+      - ./app_1/api:/usr/src/server
+    logging:
+      # ログ出力先にfluentdを指定
+      driver: "fluentd"
+      options:
+        # fluentdサーバの宛先
+        fluentd-address: "localhost:24224"
+        # ログに付与するタグ
+        tag: "app.{{.Name}}.1"
+    ports:
+      - "8020:8000"
+    networks:
+      - fluentd-stack-easy-ver3.0.4-networks
+    depends_on:
+      - fluentd-stack-easy-ver3.0.4-fluentd_1
+
+  fluentd-stack-easy-ver3.0.4-fluentd_0:
+    image: fluent/fluentd:latest
+    container_name: "fluentd-stack-easy-ver3.0.4-fluentd_0"
+    ports:
+      - "24223:24220"
+      - "24223:24220/udp"
+    environment:
+      - 'FLUENTD_CONF=fluent.conf'
+    volumes:
+      - ./fluentd_0/tmp:/fluentd/log
+      - ./fluentd_0/config:/fluentd/etc
+    networks:
+      - fluentd-stack-easy-ver3.0.4-networks
+    depends_on:
+      - fluentd-stack-easy-ver3.0.4-fluentd_01
+  
+  fluentd-stack-easy-ver3.0.4-fluentd_1:
+    image: fluent/fluentd:latest
+    container_name: "fluentd-stack-easy-ver3.0.4-fluentd_1"
+    ports:
+      - "24224:24220"
+      - "24224:24220/udp"
+    environment:
+      - 'FLUENTD_CONF=fluent.conf'
+    volumes:
+      - ./fluentd_1/tmp:/fluentd/log
+      - ./fluentd_1/config:/fluentd/etc
+    networks:
+      - fluentd-stack-easy-ver3.0.4-networks
+    depends_on:
+      - fluentd-stack-easy-ver3.0.4-fluentd_01
+  
+  fluentd-stack-easy-ver3.0.4-fluentd_01:
+    image: fluent/fluentd:latest
+    container_name: "fluentd-stack-easy-ver3.0.4-fluentd_01"
+    ports:
+      - "24225:24220"
+      - "24225:24220/udp"
+    volumes:
+      - ./fluentd_01/tmp:/fluentd/log
+      - ./fluentd_01/config:/fluentd/etc
+    networks:
+      - fluentd-stack-easy-ver3.0.4-networks
+
+
+networks:
+  fluentd-stack-easy-ver3.0.4-networks:
+    name: fluentd-stack-easy-ver3.0.4-networks
