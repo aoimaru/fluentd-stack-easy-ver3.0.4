@@ -41,6 +41,26 @@ services:
       - fluentd-stack-easy-ver3.0.4-networks
     depends_on:
       - fluentd-stack-easy-ver3.0.4-fluentd_1
+  
+  fluentd-stack-easy-ver3.0.4-app_2:
+    container_name: "fluentd-stack-easy-ver3.0.4-app_2"
+    build: ./app_2
+    volumes:
+      - ./app_2/api:/usr/src/server
+    logging:
+      # ログ出力先にfluentdを指定
+      driver: "fluentd"
+      options:
+        # fluentdサーバの宛先
+        fluentd-address: "localhost:24223"
+        # ログに付与するタグ
+        tag: "app.{{.Name}}.2"
+    ports:
+      - "8030:8000"
+    networks:
+      - fluentd-stack-easy-ver3.0.4-networks
+    depends_on:
+      - fluentd-stack-easy-ver3.0.4-fluentd_1
 
   fluentd-stack-easy-ver3.0.4-fluentd_0:
     image: fluent/fluentd:latest
@@ -57,6 +77,7 @@ services:
       - fluentd-stack-easy-ver3.0.4-networks
     depends_on:
       - fluentd-stack-easy-ver3.0.4-fluentd_01
+  
   
   fluentd-stack-easy-ver3.0.4-fluentd_1:
     image: fluent/fluentd:latest
